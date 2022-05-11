@@ -1,43 +1,47 @@
 const button = document.getElementById('criar-tarefa');
-function addItem() {
-  const input = document.getElementById('texto-tarefa');
-  const list = document.getElementById('lista-tarefas');
-  const item = document.createElement('li');
-  item.innerText = input.value;
-  list.appendChild(item);
-  input.value = '';
-}
-button.addEventListener('click', addItem);
-const tasks = document.getElementById('lista-tarefas');
 
-function bgColor(event) {
-  event.target.classList.add('selected');
-  const item = document.querySelector('.selected');
-  if (item !== event.target) {
-    item.classList.toggle('selected');
-  }
-}
-function done(event) {
-  event.target.classList.toggle('completed');
-}
-tasks.addEventListener('click', bgColor);
-tasks.addEventListener('dblclick', done);
+function removeTask({target}) {
+  target.parentElement.remove();
+};
 
-const clean = document.getElementById('apaga-tudo');
+function createTaskTemplate(text) {
+  const taskSection = document.createElement('section');
+  taskSection.classList.add('task-section');
+  taskSection.innerHTML =   
+  `<input type="checkbox" class="checkbox-task"/>
+  <p class="task">${text}</p>`;
+  const removeButton = document.createElement('button');
+  removeButton.innerText = 'X';
+  removeButton.className = 'remove-task';
+  removeButton.addEventListener('click', removeTask);
+  taskSection.appendChild(removeButton);
+  return taskSection;
+};
 
-function cleanAll() {
-  const childs = document.querySelectorAll('li');
-  for (let index = 0; index < childs.length; index += 1) {
-    childs[index].remove();
-  }
-}
-clean.addEventListener('click', cleanAll);
+function addToDoItem() {
+  const inputTask = document.getElementById('texto-tarefa');
+  const container = document.getElementById('container');
+  const taskTemplate = createTaskTemplate(inputTask.value);
+  container.appendChild(taskTemplate);
+  inputTask.value = '';
+};
 
-const cleanDone = document.getElementById('remover-finalizados');
-function removeDone() {
-  const done = document.querySelectorAll('.completed');
-  for (let index = 0; index < done.length; index += 1) {
-    done[index].remove();
-  }
+button.addEventListener('click', addToDoItem);
+
+const cleanAllButton = document.getElementById('apaga-tudo');
+
+function cleanAllTasks() {
+  const tasks = document.querySelectorAll('.task-section');
+  tasks.forEach((section) => section.remove());
 }
-cleanDone.addEventListener('click', removeDone);
+
+cleanAllButton.addEventListener('click', cleanAllTasks);
+
+const cleanDoneButton = document.getElementById('remover-finalizados');
+
+function cleanDone() {
+  const tasksCheckbox = document.querySelectorAll('.checkbox-task');
+  tasksCheckbox.forEach((checkbox) => checkbox.checked && checkbox.parentElement.remove());
+};
+
+cleanDoneButton.addEventListener('click', cleanDone);
